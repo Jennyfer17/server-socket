@@ -1,6 +1,7 @@
 package com.sd.demo.controller;
 
-import org.checkerframework.common.reflection.qual.GetClass;
+import java.util.concurrent.ExecutionException;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.sd.demo.model.BankAccount;
+import com.sd.demo.model.dto.TransferRequest;
 import com.sd.demo.service.BankAccountService;
 
 @RestController
@@ -25,23 +27,23 @@ public class BankAccountController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<BankAccount> getBankAccountById(@PathVariable String id) {
-        BankAccount account = service.getBankAccountById(id);
+    public ResponseEntity<BankAccount> getBankAccountById(@PathVariable String id) throws InterruptedException, ExecutionException {
+        BankAccount account = service.getBankAccount(id);
         if (account == null) {
             return ResponseEntity.notFound().build();
         }
         return ResponseEntity.ok(account);
     }
 
-    @PostMapping
-    public ResponseEntity<BankAccount> createBankAccount(@RequestBody BankAccount bankAccount) {
-        BankAccount createdAccount = service.createBankAccount(bankAccount);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdAccount);
+    @PostMapping("/{clientId}")
+    public ResponseEntity<BankAccount> createBankAccount(@PathVariable String clientId, @RequestBody BankAccount bankAccount) throws InterruptedException, ExecutionException {
+        BankAccount createdAccount = service.addBankAccount(clientId, bankAccount);
+        return ResponseEntity.ok(createdAccount);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<BankAccount> updateBankAccount(@PathVariable String id, @RequestBody BankAccount bankAccount) {
-        BankAccount updatedAccount = service.updateBankAccount(id, bankAccount);
+    public ResponseEntity<BankAccount> updateBankAccount(@PathVariable String id, @RequestBody BankAccount bankAccount) throws InterruptedException, ExecutionException {
+        BankAccount updatedAccount = service.updateBankAccount(bankAccount);
         if (updatedAccount == null) {
             return ResponseEntity.notFound().build();
         }
@@ -49,7 +51,7 @@ public class BankAccountController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteBankAccount(@PathVariable String id) {
+    public ResponseEntity<Void> deleteBankAccount(@PathVariable String id) throws InterruptedException, ExecutionException {
         if (service.deleteBankAccount(id)) {
             return ResponseEntity.noContent().build();
         }
@@ -57,41 +59,42 @@ public class BankAccountController {
     }
 
     @PostMapping("/{id}/transfer")
-    public ResponseEntity<Void> transferFunds(@PathVariable String id, @RequestBody TransferRequest request) {
+    public ResponseEntity<String> transferFunds(@PathVariable String id, @RequestBody TransferRequest request) throws InterruptedException, ExecutionException {
         try {
-            service.transferFunds(id, request.getToAccountId(), request.getAmount());
-            return ResponseEntity.ok().build();
+            String response = service.transferFunds(id, request.getAccountNumberTo(), request.getAmount());
+            return ResponseEntity.ok(response);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().build();
         }
     }
 
     @PostMapping("/{id}/deposit")
-    public ResponseEntity<Void> depositFunds(@PathVariable String id, @RequestBody DepositRequest request) {
+    public ResponseEntity<String> depositFunds(@PathVariable String id, @RequestBody double amount) throws InterruptedException, ExecutionException {
         try {
-            service.depositFunds(id, request.getAmount());
-            return ResponseEntity.ok().build();
+            String response = service.depositFunds(id, amount);
+            return ResponseEntity.ok(response);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().build();
         }
     }
 
     @PostMapping("/{id}/withdraw")
-    public ResponseEntity<Void> withdrawFunds(@PathVariable String id, @RequestBody WithdrawRequest request) {
+    public ResponseEntity<String> withdrawFunds(@PathVariable String id, @RequestBody double amount) throws InterruptedException, ExecutionException {
         try {
-            service.withdrawFunds(id, request.getAmount());
-            return ResponseEntity.ok().build();
+            String response = service.withdraw(id, amount);
+            return ResponseEntity.ok(response);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().build();
         }
     }
 
-    @PostMapping("/{id}/check-balance")
-    public ResponseEntity<Double> checkBalance(@PathVariable String id) {
+    @GetMapping("/{id}/check-balance")
+    public ResponseEntity<String> checkBalance(@PathVariable String id) throws InterruptedException, ExecutionException {
         try {
-            double balance = service.checkBalance(id);
-            return ResponseEntity.ok(balance);
+            String response = service.checkBalance(id);
+            return ResponseEntity.ok(response);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().build();
         }
     }
+}

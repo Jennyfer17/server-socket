@@ -1,18 +1,8 @@
 package com.sd.demo.model;
 
-import org.springframework.boot.autoconfigure.amqp.RabbitConnectionDetails.Address;
-
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
-import jakarta.persistence.Id;
-
-@Entity
-@Table(name="clients")
 public class Client {
-    @Id
     private String id;
     private String name;
-    private Address address;
     private int contactNumber;
     private String email;
     private String idDocumentNumber;
@@ -29,12 +19,6 @@ public class Client {
     }
     public void setName(String name) {
         this.name = name;
-    }
-    public Address getAddress() {
-        return address;
-    }
-    public void setAddress(Address address) {
-        this.address = address;
     }
     public int getContactNumber() {
         return contactNumber;

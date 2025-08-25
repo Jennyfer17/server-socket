@@ -2,18 +2,16 @@ package com.sd.demo.model;
 
 import java.util.Date;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
-import jakarta.persistence.Id;
-@Entity
-@Table(name="transactions")
+import com.google.firebase.database.annotations.Nullable;
+
 public class Transaction {
-    @Id
     private String id;
     private double amount;
     private String type;
     private Date date;
     private BankAccount bankAccount;
+    @Nullable
+    private String accountNumberTo;
 
     public String getId() {
         return id;
@@ -54,4 +52,13 @@ public class Transaction {
     public void setBankAccount(BankAccount bankAccount) {
         this.bankAccount = bankAccount;
     }
+
+    public String getAccountNumberTo() {
+        return accountNumberTo;
+    }
+
+    public void setAccountNumberTo(String accountNumberTo) {
+        this.accountNumberTo = accountNumberTo;
+    }
+    
 }

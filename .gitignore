@@ -31,3 +31,7 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Secrets ###
+*.env
+src/main/resources/bank-db-4e66b-firebase-adminsdk-fbsvc-10a6145a2e.json
