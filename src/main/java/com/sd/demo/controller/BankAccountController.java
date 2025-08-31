@@ -1,5 +1,6 @@
 package com.sd.demo.controller;
 
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import org.springframework.http.HttpStatus;
@@ -35,6 +36,12 @@ public class BankAccountController {
         return ResponseEntity.ok(account);
     }
 
+    @GetMapping
+    public ResponseEntity<List<BankAccount>> getAllBankAccounts() throws InterruptedException, ExecutionException {
+        List<BankAccount> accounts = service.getAllAccounts();
+        return ResponseEntity.ok(accounts);
+    }
+
     @PostMapping("/{clientId}")
     public ResponseEntity<BankAccount> createBankAccount(@PathVariable String clientId, @RequestBody BankAccount bankAccount) throws InterruptedException, ExecutionException {
         BankAccount createdAccount = service.addBankAccount(clientId, bankAccount);
@@ -61,32 +68,62 @@ public class BankAccountController {
     @PostMapping("/{id}/transfer")
     public ResponseEntity<String> transferFunds(@PathVariable String id, @RequestBody TransferRequest request) throws InterruptedException, ExecutionException {
         try {
-            String response = service.transferFunds(id, request.getAccountNumberTo(), request.getAmount());
-            return ResponseEntity.ok(response);
+            service.transferFunds(id, request.getAccountNumberTo(), request.getAmount());
+            String message = "You successfully transferred " + request.getAmount() + " from account " + id + " to account " + request.getAccountNumberTo();
+            return ResponseEntity.ok(message);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().build();
         }
     }
+    // @PostMapping("/{id}/transfer")
+    // public ResponseEntity<String> transferFunds(@PathVariable String id, @RequestBody TransferRequest request) throws InterruptedException, ExecutionException {
+    //     try {
+    //         String response = service.transferFunds(id, request.getAccountNumberTo(), request.getAmount());
+    //         return ResponseEntity.ok(response);
+    //     } catch (IllegalArgumentException e) {
+    //         return ResponseEntity.badRequest().build();
+    //     }
+    // }
 
     @PostMapping("/{id}/deposit")
     public ResponseEntity<String> depositFunds(@PathVariable String id, @RequestBody double amount) throws InterruptedException, ExecutionException {
         try {
-            String response = service.depositFunds(id, amount);
-            return ResponseEntity.ok(response);
+            service.depositFunds(id, amount);
+            String message = "You successfully deposited " + amount + " into account " + id;
+            return ResponseEntity.ok(message);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().build();
         }
     }
+    // @PostMapping("/{id}/deposit")
+    // public ResponseEntity<String> depositFunds(@PathVariable String id, @RequestBody double amount) throws InterruptedException, ExecutionException {
+    //     try {
+    //         String response = service.depositFunds(id, amount);
+    //         return ResponseEntity.ok(response);
+    //     } catch (IllegalArgumentException e) {
+    //         return ResponseEntity.badRequest().build();
+    //     }
+    // }
 
     @PostMapping("/{id}/withdraw")
     public ResponseEntity<String> withdrawFunds(@PathVariable String id, @RequestBody double amount) throws InterruptedException, ExecutionException {
         try {
-            String response = service.withdraw(id, amount);
-            return ResponseEntity.ok(response);
+            service.withdraw(id, amount);
+            String message = "You successfully withdrew " + amount + " from account " + id;
+            return ResponseEntity.ok(message);
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().build();
         }
     }
+    // @PostMapping("/{id}/withdraw")
+    // public ResponseEntity<String> withdrawFunds(@PathVariable String id, @RequestBody double amount) throws InterruptedException, ExecutionException {
+    //     try {
+    //         String response = service.withdraw(id, amount);
+    //         return ResponseEntity.ok(response);
+    //     } catch (IllegalArgumentException e) {
+    //         return ResponseEntity.badRequest().build();
+    //     }
+    // }
 
     @GetMapping("/{id}/check-balance")
     public ResponseEntity<String> checkBalance(@PathVariable String id) throws InterruptedException, ExecutionException {
